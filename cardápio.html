@@ -9,17 +9,57 @@
 <body>
     <div class="container">
         <div class="row text-center">
-            <h3>gerador de receitas para almoços aleatórios</h3>
+            <h3>Gerador de receitas para almoços aleatórios</h3>
         </div>
 
         <p>Se você está com fome, aprenda a cozinhar com as melhores receitas a um clique. <br>Em um único clique,
             geramos para você uma receita completa com todos os passos pra um almoço de respeito.</p>
-        <button class="button-primary" id="" gerarReceita">Gerar receita</button>
+        <button class="button-primary" id="gerarReceita">Gerar receita</button>
 
         <div id="receitas" class="row receitas"></div>
     </div>
 
+    <script>
+        const obterReceitaBtn = document.getElementById('gerarReceita');
+        const painelDeAlmocos = document.getElementById('receitas');
 
+        obterReceitaBtn.addEventListener('click', () => {
+            // Gera um número aleatório entre 1 e 10
+            const IDAleatorio = Math.floor(Math.random() * 10) + 1;
+            
+            fetch(`https://api-receitas-pi.vercel.app/receitas/${IDAleatorio}`)
+                .then(res => res.json())
+                .then(res => {
+                    criarReceita(res); // A API retorna um objeto, então passamos diretamente
+                })
+                .catch(e => {
+                    console.warn(e);
+                });
+        });
+
+        const criarAlmoco = Almoco => {
+            const ingredientes = Almoco.IngredientesBase[0].nomesIngrediente;
+
+            const newInnerHTML = `
+                <div class="row">
+                    <div class="columns five">
+                        <img src="${Almoco.link_imagem}" alt="Meal Image">
+                        ${Almoco.tipo ? `<p><strong>Tipo:</strong> ${Almoco.tipo}</p>` : ''}
+                        <h5>Ingredientes:</h5>
+                        <ul>
+                            ${ingredientes.map(ingrediente => `<li>${nomesIngrediente}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="columns seven">
+                        <h4>${Almoco.receita}</h4>
+                        <p>${Almoco.modo_preparo}</p>
+                    </div>
+                </div>
+            `;
+
+            painelDeAlmocos.innerHTML = newInnerHTML;
+        };
+    </script>
 </body>
 
 </html>
